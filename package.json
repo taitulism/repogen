@@ -5,7 +5,7 @@
   "private": true,
   "author": "taitulism@gmail.com",
   "license": "MIT",
-  "main": "src/index.sh",
+  "main": "repogen",
   "homepage": "https://github.com/taitulism/repogen",
   "bugs": "https://github.com/taitulism/repogen/issues",
   "keywords": [],
