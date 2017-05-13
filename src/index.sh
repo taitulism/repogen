@@ -22,13 +22,13 @@ function showTavisInstructions() {
 function copyFile () {
 	local path="$1"
 
-	cp "$CORE_TPL_PATH/$path" "$NEW_REPO/$path"
+	cp "$TPL/$path" "$NEW_REPO/$path"
 }
 
 function copyFolder () {
 	local path="$1"
 
-	cp -r "$CORE_TPL_PATH/$path" "$NEW_REPO/$path"
+	cp -r "$TPL/$path" "$NEW_REPO/$path"
 }
 
 function pause () {
@@ -81,7 +81,7 @@ function installTravis () {
 	copyFile '.travis.yml'
 
 	# Travis badge - set project name
-	badge=$(cat "$CORE_TPL_PATH/travis-badge.md" | sed "s/<NAME>/$name/g")
+	badge=$(cat "$TPL/travis-badge.md" | sed "s/<NAME>/$name/g")
 
 	# Travis badge - add to README
 	cat "$NEW_REPO/README.md" | sed "s@<TRAVIS_BADGE>@$badge@" > tmp
@@ -116,9 +116,9 @@ function pakajaso () {
 
 
 # set paths
-REPOS_PATH='/home/taitu/code/repos'
-MODULE_PATH='/home/taitu/code/repos/repogen'
-CORE_TPL_PATH='/home/taitu/code/repos/new-repo/project-core'
+PARENT="$PWD"
+REPOGEN="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+TPL="$REPOGEN/tpl"
 
 source '/home/taitu/take-me-home/van-gosh/van-go.sh'
 
@@ -131,7 +131,7 @@ if [ -z "$name" ] ; then
 	die '$name is a must.'
 fi
 
-NEW_REPO="${REPOS_PATH}/${name}"
+NEW_REPO="${PARENT}/${name}"
 
 # create project folder
 mkdir "$NEW_REPO"
@@ -148,7 +148,7 @@ copyFolder .vscode
 # create playground
 # TODO: only for js
 mkdir "$NEW_REPO/playground"
-cat "$CORE_TPL_PATH/playground/playground.js" | sed "s/<NAME>/$name/" > "$NEW_REPO/playground/playground.js"
+cat "$TPL/playground/playground.js" | sed "s/<NAME>/$name/" > "$NEW_REPO/playground/playground.js"
 
 # create src folder
 mkdir "$NEW_REPO/src"
@@ -157,7 +157,7 @@ mkdir "$NEW_REPO/src"
 CURRENT_YEAR=$(date +"%Y")
 
 # pipe from tpl > set current year > new license
-cat "${CORE_TPL_PATH}/LICENSE" | sed "s/<YEAR>/$CURRENT_YEAR/" > "$NEW_REPO/LICENSE"
+cat "${TPL}/LICENSE" | sed "s/<YEAR>/$CURRENT_YEAR/" > "$NEW_REPO/LICENSE"
 unset year
 
 # get name's length for README's title underline
@@ -175,11 +175,11 @@ read -p "$prompt" description
 
 # pipe from tpl > set name, title_underline, description > new README & package.json
 if [ -z "$description" ] ; then
-	cat "${CORE_TPL_PATH}/README.md" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" > "$NEW_REPO/README.md"
-	cat "${CORE_TPL_PATH}/package.json" | sed "s/<NAME>/$name/" > "$NEW_REPO/package.json"
+	cat "$TPL/README.md" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" > "$NEW_REPO/README.md"
+	cat "$TPL/package.json" | sed "s/<NAME>/$name/" > "$NEW_REPO/package.json"
 else
-	cat "${CORE_TPL_PATH}/README.md" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/README.md"
-	cat "${CORE_TPL_PATH}/package.json" | sed -e "s/<NAME>/$name/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/package.json"
+	cat "$TPL/README.md" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/README.md"
+	cat "$TPL/package.json" | sed -e "s/<NAME>/$name/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/package.json"
 fi
 
 # declare -a dependencies
@@ -221,7 +221,7 @@ if [ "$useEslint" = 'y' ] ; then
 		mkdir "$NEW_REPO/tests"
 
 		# copy the module's spec file
-		cat "$CORE_TPL_PATH/tests/module.spec.js" | sed "s/<NAME>/$name/" > "$NEW_REPO/tests/$name.spec.js"
+		cat "$TPL/tests/module.spec.js" | sed "s/<NAME>/$name/" > "$NEW_REPO/tests/$name.spec.js"
 
 		devDependencies+=('mocha')
 		devDependencies+=('chai')
@@ -252,9 +252,9 @@ else
 
 	# copy and parse src/index.sh
 	if [ -z "$description" ] ; then
-		cat "${CORE_TPL_PATH}/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" > "$NEW_REPO/src/index.sh"
+		cat "$TPL/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" > "$NEW_REPO/src/index.sh"
 	else
-		cat "${CORE_TPL_PATH}/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/src/index.sh"
+		cat "$TPL/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/src/index.sh"
 	fi
 
 	# change main file in package.json
@@ -289,9 +289,9 @@ logOK 'Done.'
 # ---------------
 unset name
 unset description
-unset REPOS_PATH
+unset PARENT
 unset MODULE_PATH
-unset CORE_TPL_PATH
+unset TPL
 unset NEW_REPO
 unset prop
 unset key
