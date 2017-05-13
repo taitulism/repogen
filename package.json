@@ -1,0 +1,17 @@
+{
+  "name": "repogen",
+  "description": "Repository Generator",
+  "version": "0.0.0",
+  "private": true,
+  "author": "taitulism@gmail.com",
+  "license": "MIT",
+  "main": "src/index.sh",
+  "homepage": "https://github.com/taitulism/repogen",
+  "bugs": "https://github.com/taitulism/repogen/issues",
+  "keywords": [],
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taitulism/repogen"
+  }
+}

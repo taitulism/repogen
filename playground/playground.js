@@ -1,0 +1,1 @@
+const repogen = require('../src');
