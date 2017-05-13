@@ -109,7 +109,7 @@ function pakajaso () {
 	key="$2"
 	value="$3"
 	
-	node "$MODULE_PATH/pakajaso.js" "$NEW_REPO/package.json" $prop $key "$value"
+	node "$REPOGEN/pakajaso.js" "$NEW_REPO/package.json" $prop $key "$value"
 }
 
 
@@ -290,7 +290,7 @@ logOK 'Done.'
 unset name
 unset description
 unset PARENT
-unset MODULE_PATH
+unset REPOGEN
 unset TPL
 unset NEW_REPO
 unset prop
