@@ -1,0 +1,32 @@
+*prompt: enter module name (if 2 words - split with a dash)
+*prompt: enter description
+*prompt: enter keywords. separate with commas. space is optional (e.g. one,two, three)
+create folder for project
+copy template folder contents into new folder (include .vscode)
+edit all stuff: (cat a.txt | sed -i "s/NAME/rrrrrrr/" a.txt)
+    readme - name, underline, description
+    license - set year (shell: $ date +"%Y")
+    index.js - set name in code
+    package.json - set name, description, repo url, bugs url, homepage
+    playground/playground.js - set name in code
+    src/module.js - rename file
+    test/module.spec.js - set name in code
+    test/module.spec.js - set varname in code
+    test/module.spec.js - rename file
+*prompt: Goto https://github.com/new and create a new repo (name,description)
+npm install --save-dev eslint mocha chai 
+git init
+git add .
+git commit -am "v0.0.0"
+git remote add origin git@github.com:taitulism/<NAME>.git
+git push -u origin master
+git checkout -b develop
+git push -u origin develop
+*prompt: In GitHub, set develop as default branch & set squash as default merge
+
+*prompt: Travis CI?
+    *prompt: Goto: https://travis-ci.org/profile/taitulism
+    *prompt: sync account (top right)
+    *prompt: enable & click the repo name
+    *prompt: Click the badge, change to "Markdown", copy and place it in README.md (below the license).
+    *prompt: change travis to develop branch

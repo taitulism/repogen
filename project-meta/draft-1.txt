@@ -1,0 +1,12 @@
+$ sgen create sh
+$ sgen create js
+	eslint
+	test
+	client side?
+	es6?
+		babel
+		webpack
+$ sgen create apiServer
+	build?
+$ sgen create appServer
+	build?

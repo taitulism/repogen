@@ -1,0 +1,21 @@
+{
+  "name": "<NAME>",
+  "description": "<DESCRIPTION>",
+  "version": "0.0.0",
+  "private": true,
+  "author": "taitulism@gmail.com",
+  "license": "MIT",
+  "main": "src/index.js",
+  "homepage": "https://github.com/taitulism/<NAME>",
+  "bugs": "https://github.com/taitulism/<NAME>/issues",
+  "keywords": [
+
+  ],
+  "scripts": {
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taitulism/<NAME>"
+  }
+}

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
-# repogen
-# =======
-# Repository Generator
+# <NAME>
+# <UNDERLINE>
+# <DESCRIPTION>
 #
 #
 #
