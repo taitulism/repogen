@@ -4,10 +4,300 @@
 # repogen
 # =======
 # Repository Generator
-#
-#
-#
+# Helps create a new js/sh project (repo)
+# Prompt based
+
+
+# functions
+function showTavisInstructions() {
+	echo
+	logTitle 'Travis instructions:'
+	echo '1. Goto: https://travis-ci.org/profile/taitulism'
+	echo '2. sync account (top right)'
+	echo '3. enable & click the repo name'
+	echo '4. Click the badge, change to "Markdown", copy and place it in README.md (below the license).'
+	echo '5. change travis to develop branch'
+}
+
+function copyFile () {
+	local path="$1"
+
+	cp "$CORE_TPL_PATH/$path" "$NEW_REPO/$path"
+}
+
+function copyFolder () {
+	local path="$1"
+
+	cp -r "$CORE_TPL_PATH/$path" "$NEW_REPO/$path"
+}
+
+function pause () {
+	echo "$1"
+	read -p 'Hit "Enter" when done...'
+}
+
+function die () {
+	logFail "$*"
+	echo '^C'
+	logError 'R.I.P.'
+	kill -INT $$
+}
+
+function checkPoint () {
+	if [ ! "$?" = 0 ] ; then
+		logFail 'Oh No!'
+		cat fail.log
+		rm fail.log
+		die
+	else
+		rm fail.log
+	fi
+}
+
+function initLocalRepo () {
+	logWarn '* Creating local git repository...'
+	git init > /dev/null
+	
+	logWarn '* Creating first commit...'
+	git add '.' > /dev/null
+	git commit -am "v0.0.0" > /dev/null
+	
+	logWarn '* Pushing to remote...'
+	git remote add origin "git@github.com:taitulism/$name.git"
+	git push -f -u origin master &> fail.log
+	checkPoint
+}
+
+function createDevelopBranch () {
+	logWarn '* Creating "develop" branch...'
+	git checkout -b develop &> /dev/null
+	git push -f -u origin develop &> fail.log
+	checkPoint
+}
+
+function installTravis () {
+	logWarn '* Installing Travis CI (yml file and badge)...'
+
+	copyFile '.travis.yml'
+
+	# Travis badge - set project name
+	badge=$(cat "$CORE_TPL_PATH/travis-badge.md" | sed "s/<NAME>/$name/g")
+
+	# Travis badge - add to README
+	cat "$NEW_REPO/README.md" | sed "s@<TRAVIS_BADGE>@$badge@" > tmp
+	cat tmp > "$NEW_REPO/README.md"
+	rm tmp
+
+	# sed uses @ instead of / because the var contains slashes itself and causing an error
+}
+
+function installNPMDevDeps () {
+	logWarn '* Installing npm dev dependencies...'
+	npm install --save-dev ${devDependencies[@]} > /dev/null
+}
+
+function userCreateRemoteRepo () {
+	echo
+	# TODO: turn into echo and keep going
+	prompt=$(logInfo 'Goto: https://github.com/new')' '$(logTitle 'Name & Description ONLY')
+	pause "$prompt"
+	echo
+}
+
+function pakajaso () {
+	prop="$1"
+	key="$2"
+	value="$3"
+	
+	node "$MODULE_PATH/pakajaso.js" "$NEW_REPO/package.json" $prop $key "$value"
+}
 
 
 
+
+# set paths
+REPOS_PATH='/home/taitu/code/repos'
+MODULE_PATH='/home/taitu/code/repos/repogen'
+CORE_TPL_PATH='/home/taitu/code/repos/new-repo/project-core'
+
+source '/home/taitu/take-me-home/van-gosh/van-go.sh'
+
+# ask for name
+prompt=$(logInfo 'Name?')' '$(logComment '(split-words-with-a-dash)')' '
+read -p "$prompt" name
+
+# die if no name
+if [ -z "$name" ] ; then
+	die '$name is a must.'
+fi
+
+NEW_REPO="${REPOS_PATH}/${name}"
+
+# create project folder
+mkdir "$NEW_REPO"
+
+# create empty core files
+touch "$NEW_REPO/LICENSE"
+touch "$NEW_REPO/README.md"
+touch "$NEW_REPO/package.json"
+
+# copy .vscode
+# TODO: only for js
+copyFolder .vscode
+
+# create playground
+# TODO: only for js
+mkdir "$NEW_REPO/playground"
+cat "$CORE_TPL_PATH/playground/playground.js" | sed "s/<NAME>/$name/" > "$NEW_REPO/playground/playground.js"
+
+# create src folder
+mkdir "$NEW_REPO/src"
+
+# set year (to put in license file)
+CURRENT_YEAR=$(date +"%Y")
+
+# pipe from tpl > set current year > new license
+cat "${CORE_TPL_PATH}/LICENSE" | sed "s/<YEAR>/$CURRENT_YEAR/" > "$NEW_REPO/LICENSE"
+unset year
+
+# get name's length for README's title underline
+# this for matching the number of '=' with the $name length (=== is <h1> in markdown)
+nameLen=${#name}
+underline=''
+for i in $(seq 1 $nameLen); do
+	# js equiv:  underline += '=';
+	underline=$underline=; 
+done
+
+# ask for description
+prompt=$(logInfo 'Description? ')
+read -p "$prompt" description
+
+# pipe from tpl > set name, title_underline, description > new README & package.json
+if [ -z "$description" ] ; then
+	cat "${CORE_TPL_PATH}/README.md" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" > "$NEW_REPO/README.md"
+	cat "${CORE_TPL_PATH}/package.json" | sed "s/<NAME>/$name/" > "$NEW_REPO/package.json"
+else
+	cat "${CORE_TPL_PATH}/README.md" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/README.md"
+	cat "${CORE_TPL_PATH}/package.json" | sed -e "s/<NAME>/$name/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/package.json"
+fi
+
+# declare -a dependencies
+declare -a devDependencies
+
+# ask about eslint
+prompt=$(logInfo 'eslint?')' '$(logComment '[y/n]')' '
+read -p "$prompt" useEslint
+
+if [ "$useEslint" = 'y' ] ; then
+	# javascript module
+
+	# copy ignore files
+	copyFile .gitignore
+	copyFile .npmignore
+
+	# pkgJson add scripts.lint
+	prop='scripts'
+	key='lint'
+	value='eslint ./index.js ./src'
+	pakajaso $prop $key "$value"
+
+	copyFile .eslintrc.js
+
+	devDependencies+=('eslint')
+	
+	# ask about test
+	prompt=$(logInfo 'Tests?')' '$(logComment '[y/n]')' '
+	read -p "$prompt" useTest
+
+	if [ "$useTest" = 'y' ] ; then
+		# pkgJson add scripts.test
+		prop='scripts'
+		key='test'
+		value='mocha tests/**/*.spec.js'
+		pakajaso $prop $key "$value"
+
+		# create tests folder
+		mkdir "$NEW_REPO/tests"
+
+		# copy the module's spec file
+		cat "$CORE_TPL_PATH/tests/module.spec.js" | sed "s/<NAME>/$name/" > "$NEW_REPO/tests/$name.spec.js"
+
+		devDependencies+=('mocha')
+		devDependencies+=('chai')
+		devDependencies+=('sinon')
+		devDependencies+=('sinon-chai')
+	fi
+
+	# copy index.js
+	copyFile "src/index.js"
+	
+	cd $NEW_REPO
+	
+	installNPMDevDeps
+	
+	if [ "$useTest" = 'y' ] ; then
+		installTravis
+	fi
+
+	userCreateRemoteRepo
+	initLocalRepo
+	createDevelopBranch
+	
+	if [ "$useTest" = 'y' ] ; then
+		showTavisInstructions
+	fi
+else
+	# shell script
+
+	# copy and parse src/index.sh
+	if [ -z "$description" ] ; then
+		cat "${CORE_TPL_PATH}/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" > "$NEW_REPO/src/index.sh"
+	else
+		cat "${CORE_TPL_PATH}/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/src/index.sh"
+	fi
+
+	# change main file in package.json
+	prop='main'
+	value='src/index.sh'
+	pakajaso $prop $value
+
+	# remove Travis badge placeholder from README
+	cat "$NEW_REPO/README.md" | sed "s/<TRAVIS_BADGE>//" > tmp
+	cat tmp > "$NEW_REPO/README.md"
+	rm tmp
+
+	cd $NEW_REPO
+
+	userCreateRemoteRepo
+	initLocalRepo
+	createDevelopBranch
+fi
+
+echo
+# TODO: what to do with this?
+pause "In GitHub, set develop as default branch & set squash as default merge"
+
+cd '..'
+
+echo
+logOK 'Done.'
+
+# TODO: check all var are unset
+# ---------------
 # unset variables
+# ---------------
+unset name
+unset description
+unset REPOS_PATH
+unset MODULE_PATH
+unset CORE_TPL_PATH
+unset NEW_REPO
+unset prop
+unset key
+unset value
+unset useEslint
+unset useTravis
+unset useTest
+unset badge
+unset devDependencies
