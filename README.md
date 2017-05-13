@@ -12,4 +12,7 @@ My Repository Generator:
 * Helps create a new js/sh project (repo)
 * Prompt based
 
-Run `$ ./repogen.sh` from the parent folder.
+
+Installation
+------------
+Copy and run `$ ./repogen.sh` from the parent folder.
