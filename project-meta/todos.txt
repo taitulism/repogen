@@ -1,4 +1,5 @@
 * inline TODOs
 * it looks like .vscode is ignored by the tpl/.gitignore file
+* choose license
 * eslint config (my preset)
 * next phase readme template (install, usage, contribute, changelog?, footer - thanks, bugs)
