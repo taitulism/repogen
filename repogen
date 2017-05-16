@@ -288,7 +288,9 @@ logOK 'Done.'
 # unset variables
 # ---------------
 unset name
+unset nameLen
 unset description
+unset underline
 unset PARENT
 unset REPOGEN
 unset TPL
@@ -301,3 +303,4 @@ unset useTravis
 unset useTest
 unset badge
 unset devDependencies
+unset CURRENT_YEAR
