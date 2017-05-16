@@ -2,6 +2,7 @@
 * it looks like .vscode is ignored by the tpl/.gitignore file
 * choose license
 * separate to small files
+* remove travis from flow (keep somewhere). not actually TDDing from the start...
 * consider local repo exists (.git file)
 * eslint config (my preset)
 * next phase readme template (install, usage, contribute, changelog?, footer - thanks, bugs)
