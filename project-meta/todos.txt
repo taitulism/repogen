@@ -1,5 +1,6 @@
 * inline TODOs
-* it looks like .vscode is ignored by the tpl/.gitignore file
+* use ignore-cmd
+	it looks like .vscode is ignored by the tpl/.gitignore file
 * choose license
 * separate to small files
 * remove travis from flow (keep somewhere). not actually TDDing from the start...
