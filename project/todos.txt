@@ -1,4 +1,5 @@
 * inline TODOs
+* prompt with default
 * use ignore-cmd
 	it looks like .vscode is ignored by the tpl/.gitignore file
 * separate to small files

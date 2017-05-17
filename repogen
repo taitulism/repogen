@@ -157,12 +157,12 @@ if [ "$useEslint" = 'y' ] ; then
 
 	unset useEslint
 
+	mkdir "$NEW_REPO/src"
+
 	copyFile src/index.js
 	copyFile .gitignore
 	copyFile .npmignore
 	copyFolder .vscode
-
-	mkdir "$NEW_REPO/src"
 
 	# create playground
 	mkdir "$NEW_REPO/playground"
