@@ -115,24 +115,12 @@ touch "$NEW_REPO/LICENSE"
 touch "$NEW_REPO/README.md"
 touch "$NEW_REPO/package.json"
 
-# copy .vscode
-# TODO: only for js
-copyFolder .vscode
-
-# create playground
-# TODO: only for js
-mkdir "$NEW_REPO/playground"
-cat "$TPL/playground/playground.js" | sed "s/<NAME>/$name/" > "$NEW_REPO/playground/playground.js"
-
-# create src folder
-mkdir "$NEW_REPO/src"
-
 # set year (to put in license file)
-CURRENT_YEAR=$(date +"%Y")
+current_year=$(date +"%Y")
 
 # pipe from tpl > set current year > new license
-cat "${TPL}/LICENSE" | sed "s/<YEAR>/$CURRENT_YEAR/" > "$NEW_REPO/LICENSE"
-unset year
+cat "${TPL}/LICENSE" | sed "s/<YEAR>/$current_year/" > "$NEW_REPO/LICENSE"
+unset current_year
 
 # get name's length for README's title underline
 # this for matching the number of '=' with the $name length (=== is <h1> in markdown)
@@ -142,6 +130,7 @@ for i in $(seq 1 $nameLen); do
 	# js equiv:  underline += '=';
 	underline=$underline=; 
 done
+unset nameLen
 
 # ask for description
 prompt=$(logInfo 'Description? ')
@@ -166,9 +155,16 @@ read -p "$prompt" useEslint
 if [ "$useEslint" = 'y' ] ; then
 	# javascript module
 
-	# copy ignore files
+	copyFile src/index.js
 	copyFile .gitignore
 	copyFile .npmignore
+	copyFolder .vscode
+
+	mkdir "$NEW_REPO/src"
+
+	# create playground
+	mkdir "$NEW_REPO/playground"
+	cat "$TPL/playground/playground.js" | sed "s/<NAME>/$name/" > "$NEW_REPO/playground/playground.js"
 
 	# pkgJson add scripts.lint
 	prop='scripts'
@@ -203,9 +199,6 @@ if [ "$useEslint" = 'y' ] ; then
 		devDependencies+=('sinon-chai')
 	fi
 
-	# copy index.js
-	copyFile "src/index.js"
-	
 	cd $NEW_REPO
 	
 	installNPMDevDeps
@@ -217,14 +210,14 @@ else
 
 	# copy and parse src/index.sh
 	if [ -z "$description" ] ; then
-		cat "$TPL/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" > "$NEW_REPO/src/index.sh"
+		cat "$TPL/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" > "$NEW_REPO/index.sh"
 	else
-		cat "$TPL/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/src/index.sh"
+		cat "$TPL/src/index.sh" | sed -e "s/<NAME>/$name/" -e "s/<UNDERLINE>/$underline/" -e "s/<DESCRIPTION>/$description/" > "$NEW_REPO/index.sh"
 	fi
 
 	# change main file in package.json
 	prop='main'
-	value='src/index.sh'
+	value='index.sh'
 	pakajaso $prop $value
 
 	cd $NEW_REPO
@@ -247,7 +240,6 @@ logOK 'Done.'
 # unset variables
 # ---------------
 unset name
-unset nameLen
 unset description
 unset underline
 unset PARENT
@@ -261,4 +253,3 @@ unset useEslint
 unset useTest
 unset badge
 unset devDependencies
-unset CURRENT_YEAR
