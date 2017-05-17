@@ -90,7 +90,7 @@ function pakajaso () {
 
 
 # set paths
-PARENT="$PWD"
+parentFolder="$PWD"
 REPOGEN="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TPL="$REPOGEN/tpl"
 
@@ -105,7 +105,7 @@ if [ -z "$name" ] ; then
 	die '$name is a must.'
 fi
 
-NEW_REPO="${PARENT}/${name}"
+NEW_REPO="${parentFolder}/${name}"
 
 # create project folder
 mkdir "$NEW_REPO"
@@ -155,6 +155,8 @@ read -p "$prompt" useEslint
 if [ "$useEslint" = 'y' ] ; then
 	# javascript module
 
+	unset useEslint
+
 	copyFile src/index.js
 	copyFile .gitignore
 	copyFile .npmignore
@@ -181,6 +183,8 @@ if [ "$useEslint" = 'y' ] ; then
 	read -p "$prompt" useTest
 
 	if [ "$useTest" = 'y' ] ; then
+		unset useTest
+
 		# pkgJson add scripts.test
 		prop='scripts'
 		key='test'
@@ -202,9 +206,6 @@ if [ "$useEslint" = 'y' ] ; then
 	cd $NEW_REPO
 	
 	installNPMDevDeps
-	userCreateRemoteRepo
-	initLocalRepo
-	createDevelopBranch
 else
 	# shell script
 
@@ -221,35 +222,32 @@ else
 	pakajaso $prop $value
 
 	cd $NEW_REPO
-
-	userCreateRemoteRepo
-	initLocalRepo
-	createDevelopBranch
 fi
 
-echo
-logInfo "In GitHub, set 'develop' as default branch & 'squash' as default merge"
+userCreateRemoteRepo
+initLocalRepo
+createDevelopBranch
 
 cd '..'
 
 echo
+logInfo "In GitHub, set 'develop' as default branch & 'squash' as default merge"
+
+echo
 logOK 'Done.'
 
-# TODO: check all var are unset
 # ---------------
 # unset variables
 # ---------------
 unset name
 unset description
 unset underline
-unset PARENT
+unset parentFolder
 unset REPOGEN
 unset TPL
 unset NEW_REPO
 unset prop
 unset key
 unset value
-unset useEslint
-unset useTest
-unset badge
 unset devDependencies
+unset prompt

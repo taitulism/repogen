@@ -35,3 +35,5 @@ cat tmp > "$NEW_REPO/README.md"
 rm tmp
 
 unset useTravis
+unset badge
+
