@@ -1,7 +1,7 @@
 {
   "name": "repogen",
   "description": "Repository Generator",
-  "version": "0.0.0",
+  "version": "0.0.3",
   "private": true,
   "author": "taitulism@gmail.com",
   "license": "MIT",
