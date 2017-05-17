@@ -9,16 +9,6 @@
 
 
 # functions
-function showTavisInstructions() {
-	echo
-	logTitle 'Travis instructions:'
-	echo '1. Goto: https://travis-ci.org/profile/taitulism'
-	echo '2. sync account (top right)'
-	echo '3. enable & click the repo name'
-	echo '4. Click the badge, change to "Markdown", copy and place it in README.md (below the license).'
-	echo '5. change travis to develop branch'
-}
-
 function copyFile () {
 	local path="$1"
 
@@ -73,22 +63,6 @@ function createDevelopBranch () {
 	git checkout -b develop &> /dev/null
 	git push -f -u origin develop &> fail.log
 	checkPoint
-}
-
-function installTravis () {
-	logWarn '* Installing Travis CI (yml file and badge)...'
-
-	copyFile '.travis.yml'
-
-	# Travis badge - set project name
-	badge=$(cat "$TPL/travis-badge.md" | sed "s/<NAME>/$name/g")
-
-	# Travis badge - add to README
-	cat "$NEW_REPO/README.md" | sed "s@<TRAVIS_BADGE>@$badge@" > tmp
-	cat tmp > "$NEW_REPO/README.md"
-	rm tmp
-
-	# sed uses @ instead of / because the var contains slashes itself and causing an error
 }
 
 function installNPMDevDeps () {
@@ -235,18 +209,9 @@ if [ "$useEslint" = 'y' ] ; then
 	cd $NEW_REPO
 	
 	installNPMDevDeps
-	
-	if [ "$useTest" = 'y' ] ; then
-		installTravis
-	fi
-
 	userCreateRemoteRepo
 	initLocalRepo
 	createDevelopBranch
-	
-	if [ "$useTest" = 'y' ] ; then
-		showTavisInstructions
-	fi
 else
 	# shell script
 
@@ -262,11 +227,6 @@ else
 	value='src/index.sh'
 	pakajaso $prop $value
 
-	# remove Travis badge placeholder from README
-	cat "$NEW_REPO/README.md" | sed "s/<TRAVIS_BADGE>//" > tmp
-	cat tmp > "$NEW_REPO/README.md"
-	rm tmp
-
 	cd $NEW_REPO
 
 	userCreateRemoteRepo
@@ -275,8 +235,7 @@ else
 fi
 
 echo
-# TODO: what to do with this?
-pause "In GitHub, set develop as default branch & set squash as default merge"
+logInfo "In GitHub, set 'develop' as default branch & 'squash' as default merge"
 
 cd '..'
 
@@ -299,7 +258,6 @@ unset prop
 unset key
 unset value
 unset useEslint
-unset useTravis
 unset useTest
 unset badge
 unset devDependencies
