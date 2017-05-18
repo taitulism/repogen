@@ -1,5 +1,6 @@
 * inline TODOs
 * prompt with default
+* scripts.start: "node app.js"
 * use ignore-cmd
 	it looks like .vscode is ignored by the tpl/.gitignore file
 * separate to small files
