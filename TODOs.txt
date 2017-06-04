@@ -1,0 +1,3 @@
+- FIX: vscode folder gets copied twice
+- IMP: launch.json replace node 2 > node  (2 deprecated)
+- ADD: .editorconfig
